@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="file"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hash Calculator</h1>
+        <input type="text" id="inputText" placeholder="Enter text...">
+        <br>
+        <input type="file" id="fileInput" onchange="handleFile(this.files)">
+        <br>
+        <button onclick="calculateHash('MD5')">MD5</button>
+        <button onclick="calculateHash('SHA-1')">SHA-1</button>
+        <button onclick="calculateHash('SHA-256')">SHA-256</button>
+        <button onclick="calculateHash('SHA-384')">SHA-384</button>
+        <button onclick="calculateHash('SHA-512')">SHA-512</button>
+        <br>
+        <button onclick="calculateHash('SHA3-256')">SHA3-256</button>
+        <button onclick="calculateHash('SHA3-384')">SHA3-384</button>
+        <button onclick="calculateHash('SHA3-512')">SHA3-512</button>
+        <button onclick="calculateHash('RIPEMD160')">RIPEMD-160</button>
+        <button onclick="calculateHash('SHA3-224')">SHA3-224</button>
+        <br>
+        <p id="hashResult1"></p>
+        <p id="hashResult2"></p>
+        <button onclick="copyHash(1)">Copy Hash 1</button>
+        <button onclick="copyHash(2)">Copy Hash 2</button>
+        <button onclick="saveHash(1)">Save Hash 1</button>
+        <button onclick="saveHash(2)">Save Hash 2</button>
+        <br>
+        <button onclick="compareHashes()">Compare Hashes</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script>
+        function handleFile(files) {
+            var file = files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('inputText').value = e.target.result;
+            }
+            reader.readAsText(file);
+        }
+
+        function calculateHash(hashType) {
+            var inputText = document.getElementById('inputText').value;
+            var hashResult1 = document.getElementById('hashResult1');
+            var hashResult2 = document.getElementById('hashResult2');
+            if (inputText.trim() === '') {
+                hashResult1.innerText = 'Please enter some text or select a file.';
+                return;
+            }
+            var hash;
+            switch (hashType) {
+                case 'MD5':
+                    hash = md5(inputText);
+                    break;
+                case 'SHA-1':
+                    hash = sha1(inputText);
+                    break;
+                case 'SHA-256':
+                    hash = sha256(inputText);
+                    break;
+                case 'SHA-384':
+                    hash = sha384(inputText);
+                    break;
+                case 'SHA-512':
+                    hash = sha512(inputText);
+                    break;
+                case 'SHA3-256':
+                    hash = sha3_256(inputText);
+                    break;
+                case 'SHA3-384':
+                    hash = sha3_384(inputText);
+                    break;
+                case 'SHA3-512':
+                    hash = sha3_512(inputText);
+                    break;
+                case 'RIPEMD160':
+                    hash = ripemd160(inputText);
+                    break;
+                case 'SHA3-224':
+                    hash = sha3_224(inputText);
+                    break;
+                default:
+                    hashResult1.innerText = 'Invalid hash type.';
+                    return;
+            }
+
+            if (hashResult1.innerText === '') {
+                hashResult1.innerText = hashType + ' Hash: ' + hash;
+            } else {
+                hashResult2.innerText = hashType + ' Hash: ' + hash;
+            }
+        }
+
+        function copyHash(hashNumber) {
+            var hashResult = document.getElementById('hashResult' + hashNumber);
+            var range = document.createRange();
+            range.selectNode(hashResult);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+        }
+
+        function saveHash(hashNumber) {
+            var hashResult = document.getElementById('hashResult' + hashNumber).innerText;
+            if (hashResult === '') {
+                alert("Calculate hash first!");
+                return;
+            }
+            localStorage.setItem('savedHash' + hashNumber, hashResult);
+            alert("Hash " + hashNumber + " saved!");
+        }
+
+        function compareHashes() {
+            var hash1 = localStorage.getItem('savedHash1');
+            var hash2 = localStorage.getItem('savedHash2');
+            if (!hash1 || !hash2) {
+                alert("Please save two hashes first!");
+                return;
+            }
+            if (hash1 === hash2) {
+                alert("Hashes match!");
+            } else {
+                alert("Hashes do not match!");
+            }
+        }
+
+        function md5(str) {
+            return CryptoJS.MD5(str).toString();
+        }
+
+        function sha1(str) {
+            return CryptoJS.SHA1(str).toString();
+        }
+
+        function sha256(str) {
+            return CryptoJS.SHA256(str).toString();
+        }
+
+        function sha384(str) {
+            return CryptoJS.SHA384(str).toString();
+        }
+
+        function sha512(str) {
+            return CryptoJS.SHA512(str).toString();
+        }
+
+        function sha3_256(str) {
+            return CryptoJS.SHA3(str, { outputLength: 256 }).toString();
+        }
+
+        function sha3_384(str) {
+            return CryptoJS.SHA3(str, { outputLength: 384 }).toString();
+        }
+
+        function sha3_512(str) {
+            return CryptoJS.SHA3(str, { outputLength: 512 }).toString();
+        }
+
+        function ripemd160(str) {
+            return CryptoJS.RIPEMD160(str).toString();
+        }
+
+        function sha3_224(str) {
+            return CryptoJS.SHA3(str, { outputLength: 224 }).toString();
+        }
+
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</body>
+</html>
